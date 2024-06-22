@@ -43,7 +43,7 @@ jobs:
           USERNAME: ${{ github.actor }}
           PACKAGE_READ_ONLY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./gradle build
+          gradle build
 
       - name: Capture release artifacts
         uses: actions/upload-artifact@main
