@@ -40,13 +40,25 @@ jobs:
 
       - name: Build with Gradle
         env:
-          USERNAME: ${{ github.actor }}
-          PACKAGE_READ_ONLY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: yjcxgjmtd
+          PACKAGE_READ_ONLY_TOKEN: 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
+        
         run: |
-          gradle build
+          ./gradlew build
 
-      - name: Capture release artifacts
-        uses: actions/upload-artifact@main
+      - name: Find Artifact
+        if: github.event_name == 'push'
+        run: |
+          ARTIFACT_FILE=$(find $BUILD_DIR -name $JAR_PATTERN -maxdepth 1 | grep -v sources)
+          ARTIFACT_NAME=$(basename -- "$ARTIFACT_FILE" .jar)
+
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
+          echo "ARTIFACT_FILE=$ARTIFACT_FILE" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Push to GitHub Artifacts
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
         with:
-          name: Fabric ${{ matrix.minecraft }}
-          path: build/release/
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_FILE }}
